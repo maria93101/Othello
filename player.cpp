@@ -6,6 +6,8 @@
  * within 30 seconds.
  */
 Player::Player(Side side) {
+	// Changes made by Sasha. 
+	
     // Will be set to true in test_minimax.cpp.
     testingMinimax = false;
 
