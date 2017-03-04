@@ -2,6 +2,7 @@
 #define __PLAYER_H__
 
 #include <iostream>
+#include <vector>
 #include "common.hpp"
 #include "board.hpp"
 using namespace std;
@@ -16,6 +17,10 @@ public:
 
     // Flag to tell if the player is running within the test_minimax context
     bool testingMinimax;
+protected:
+	Side side_other;
+	Side my_side;
+	Board board;
 };
 
 #endif

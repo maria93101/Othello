@@ -16,12 +16,22 @@ Player::Player(Side side) {
      * precalculating things, etc.) However, remember that you will only have
      * 30 seconds.
      */
+     
+     board = Board();
+     my_side = side;
+     if (side == BLACK) {
+		 side_other = WHITE;
+	 }
+	 else 
+		side_other = BLACK;
+
 }
 
 /*
  * Destructor for the player.
  */
 Player::~Player() {
+	
 }
 
 /*
@@ -42,5 +52,53 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
      * TODO: Implement how moves your AI should play here. You should first
      * process the opponent's opponents move before calculating your own move
      */
-    return nullptr;
+     
+     // Initialize a vector with all 64 moves
+     vector<Move> legal_moves;
+     for (unsigned int i = 0; i < 8; i++) {
+		for (unsigned int j = 0; j < 8; j++) {
+			legal_moves.push_back(Move(i, j));
+		}
+	}
+     
+    std::cerr << legal_moves.size() << std::endl; 
+    for (unsigned int i = legal_moves.size() - 1; i >= 0; i--) {
+		if (! board.checkMove(&legal_moves[i], my_side)) {
+			legal_moves.pop_back();
+		}
+	}
+	
+	if (legal_moves.size() != 0) {
+		board.doMove(&legal_moves[0], my_side);
+		return &legal_moves[0];
+	}
+		
+	else {
+		return nullptr;
+	}
+		
+			
+    
+   /*
+     Move temp = Move(0, 0);
+     board.doMove(opponentsMove, side_other);
+	 if (board.hasMoves(my_side)) {
+		 for (unsigned int i = 0; i < 8; i++) {
+			 for (unsigned int j = 0; j < 8; j++) {
+				 temp = Move(i, j);
+				 if (board.checkMove(&temp, my_side)) {
+					 // legal_moves.push_back(temp);
+					 board.doMove(&temp, my_side);
+					 return &temp;
+				 } 
+			 }
+		 }
+		 // board.doMove(&legal_moves[0], my_side);
+		 // return &legal_moves[0];
+	 }
+	 else {
+		return nullptr;
+	}
+	*/
+	
 }
