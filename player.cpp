@@ -62,9 +62,11 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
 	}
      
     std::cerr << legal_moves.size() << std::endl; 
-    for (unsigned int i = legal_moves.size() - 1; i >= 0; i--) {
+
+    for (int i = legal_moves.size() - 1; i >= 0; i--) {
 		if (! board.checkMove(&legal_moves[i], my_side)) {
 			legal_moves.pop_back();
+			std::cerr << "blah" << i << std::endl;
 		}
 	}
 	
