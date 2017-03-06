@@ -52,8 +52,13 @@ int Player::evaluate(Move *move)
 	int their_points = copy->count(side_other);
 
 	// if the move is a corner piece, add three to my score.
+	if(move->getX() == 0 or move->getX() == 7 or move->getX() == 0 or move->getX() == 7)
+	{
+		my_points += 3;
+	}
 
-	// if it is adjacent to a corner piece
+	// if it is adjacent to a corner piece, subtract three to my score.
+	//if ((move->getX() == 0 and move->getY() == 7) or (move->getX() == 1 or move->getX() == 6)
 
 	return my_points - their_points;
 
@@ -151,8 +156,8 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
 			}
 		}
 		std::cerr << "best value " << moves_values[max_index] << std::endl;
-		board.doMove(&legal_moves[0], my_side);
-		return new Move(legal_moves[0]);
+		board.doMove(&legal_moves[max_index], my_side);
+		return new Move(legal_moves[max_index]);
 	}
 	else 
 	{
