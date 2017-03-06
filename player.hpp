@@ -15,6 +15,7 @@ public:
 
     Move *doMove(Move *opponentsMove, int msLeft);
     int evaluate(Move *move);
+    bool adjacent_to_corner(Move *move);
 
     // Flag to tell if the player is running within the test_minimax context
     bool testingMinimax;

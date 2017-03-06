@@ -34,11 +34,27 @@ Player::~Player() {
 	
 }
 
+/*
+ * Takes in a legal move, and returns true if the move is adjacent to a corner piece, and false otherwise!
+ */
+bool Player::adjacent_to_corner(Move *move)
+{
+	// checking if move is top left adjacent corner
+	bool tl = (move->getX() == 1 and move->getY() == 0) or (move->getX() == 0 and move->getY() == 1) or (move->getX() == 1 and move->getY() == 1);
+
+	//bottom left etc......
+	bool bl = (move->getX() == 0 and move->getY() == 6) or (move->getX() == 1 and move->getY() == 7) or (move->getX() == 1 and move->getY() == 6);
+
+	bool tr =  (move->getX() == 6 and move->getY() == 0) or (move->getX() == 6 and move->getY() == 1) or (move->getX() == 7 and move->getY() == 1);
+
+	bool br = (move->getX() == 6 and move->getY() == 7) or (move->getX() == 7 and move->getY() == 6) or (move->getX() == 6 and move->getY() == 6);
+	return tl or bl or tr or br;
+}
 
 /*
  * Takes in a legal move, and returns a integer value representing the "goodness" of the move. 
  * This is calculated by subracting the number of pieces of your color and subtracting the number of 
- * pieces of your opponent's color.
+ * pieces of your opponent's color, accounting for places on the board that are more or less desirable.
  */
 int Player::evaluate(Move *move)
 {
@@ -51,14 +67,18 @@ int Player::evaluate(Move *move)
 	int my_points = copy->count(my_side);
 	int their_points = copy->count(side_other);
 
-	// if the move is a corner piece, add three to my score.
-	if(move->getX() == 0 or move->getX() == 7 or move->getX() == 0 or move->getX() == 7)
+	// If the move is one of the four corner pieces, add three to my score.
+	if ((move->getX() == 0 and move->getY() == 0) or (move->getX() == 7 and move->getY() == 0) or (move->getX() == 0 and move->getY() == 7) or (move->getX() == 7 and move->getY() == 7))
 	{
 		my_points += 3;
 	}
 
-	// if it is adjacent to a corner piece, subtract three to my score.
-	//if ((move->getX() == 0 and move->getY() == 7) or (move->getX() == 1 or move->getX() == 6)
+	// If it is adjacent to a corner piece, subtract three to my score. 
+	// I'm calling a helper function in order to determine if I'm adjcent to a corner :)
+	if(this->adjacent_to_corner(move))
+	{
+		my_points -= 3;
+	}
 
 	return my_points - their_points;
 
@@ -79,11 +99,6 @@ int Player::evaluate(Move *move)
  * return nullptr.
  */
 Move *Player::doMove(Move *opponentsMove, int msLeft) {
-    /*
-     * TODO: Implement how moves your AI should play here. You should first
-     * process the opponent's opponents move before calculating your own move
-     */
-
      /*
 	THIS IS CODE FOR THE RANDOM AI!
 
@@ -108,18 +123,6 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
 	}
 	*/
 
-	/*
-	if we have a possible legal move:
-		Add legal moves to a vector
-		Assign high values to moves that have opposite color circles adjacent to them and ...
-		Make each possible move on a copy of the board and check how many circles are white/black and assign in a value in a vector. 
-		Return the move with the highest value
-
-	else:
-		pass
-
-	*/
-
 	vector<Move> legal_moves;
 	vector<int> moves_values;
     
@@ -141,7 +144,6 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
 					legal_moves.push_back(temp);
 					int temp_value = this->evaluate(new Move(temp));
 					moves_values.push_back(temp_value);
-					std::cerr << "blah " << temp_value << std::endl;
 				} 
 			}
 		}
