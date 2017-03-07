@@ -15,14 +15,16 @@ public:
 
     Move *doMove(Move *opponentsMove, int msLeft);
     int evaluate(Move *move, Board board);
+    int minimax(Side side, Board board, int depth);
     bool adjacent_to_corner(Move *move);
+    Board board;
 
     // Flag to tell if the player is running within the test_minimax context
     bool testingMinimax;
 protected:
 	Side side_other;
 	Side my_side;
-	Board board;
+	Move best_move = Move(0, 0);
 };
 
 #endif
