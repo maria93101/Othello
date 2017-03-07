@@ -56,7 +56,7 @@ bool Player::adjacent_to_corner(Move *move)
  * This is calculated by subracting the number of pieces of your color and subtracting the number of 
  * pieces of your opponent's color, accounting for places on the board that are more or less desirable.
  */
-int Player::evaluate(Move *move)
+int Player::evaluate(Move *move, Board board)
 {
 	//Create copy of board
 	Board *copy = board.copy();
@@ -123,10 +123,14 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
 	}
 	*/
 
-	vector<Move> legal_moves;
-	vector<int> moves_values;
     
-
+    
+	// Code for the AI that beats SimplePlayer
+	
+	/*
+	 vector<Move> legal_moves;
+	 vector<int> moves_values;
+	 
      Move temp = Move(0, 0);
      // Keeping track of board state.
      board.doMove(opponentsMove, side_other);
@@ -142,7 +146,7 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
 				if (board.checkMove(&temp, my_side)) 
 				{
 					legal_moves.push_back(temp);
-					int temp_value = this->evaluate(new Move(temp));
+					int temp_value = this->evaluate(new Move(temp), board);
 					moves_values.push_back(temp_value);
 				} 
 			}
@@ -165,5 +169,111 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
 	{
 		return nullptr;
 	}
+	*/
+	
+	
+	// IMPLEMENTATION OF MINIMAX
+	
+	vector<Move> legal_moves;
+	
+	Move temp = Move(0, 0);
+     // Keeping track of board state.
+    board.doMove(opponentsMove, side_other);
+
+	if (board.hasMoves(my_side)) 
+	{
+		 for (int i = 0; i < 8; i++) 
+		 {
+			for (int j = 0; j < 8; j++) 
+			{
+				temp = Move(i, j);
+				 
+				if (board.checkMove(&temp, my_side)) 
+				{
+					legal_moves.push_back(temp);
+				} 
+			}
+		}
+		
+		//Create a copy of board
+		Board *copyboard = board.copy();
+		
+		// Go through our vector of possible moves that we can make and 
+		// apply them to the copy of the board. Then evaluate all the 
+		// possible moves of our opponent and minimize their gain. 
+
+		vector<Move> opponents_moves;
+		vector<int> opponents_values;
+		vector<int> minimum_values;
+		temp = Move(0, 0);
+		
+		for (int x = 0; x < legal_moves.size(); x++) {
+			
+			copyboard->doMove(&legal_moves[x], my_side);
+			
+			if (copyboard->hasMoves(side_other)) {
+				// Evaluate the  possible moves of the opponent. 
+				for (int i = 0; i < 8; i++) {
+					for (int j = 0; j < 8; j++) {
+						temp = Move(i, j);
+						if (copyboard->checkMove(&temp, side_other)) 
+						{
+							opponents_moves.push_back(temp);
+							int temp_value = this->evaluate(new Move(temp), *copyboard);
+							opponents_values.push_back(temp_value);
+						} 
+					}
+				}
+			} 	
+			
+			// Find the minimum value outputted by the heuristic helper 
+			// function in order to consider the worst possible scenario 
+			// that a particular move could result in. 
+			
+			int min_index = 0;
+			for (int i = 0; i < opponents_values.size(); i++)
+			{
+				if(opponents_values[min_index] > opponents_values[i])
+				{
+					min_index = i;
+				}
+			}
+			
+			// Add the minimum value to the minimum_values vector
+			minimum_values.push_back(opponents_values[min_index]);
+			
+			// Clear the vectors opponents_moves and opponents_values
+			// before evaluating our next possible move. 
+			
+			opponents_moves.clear();
+			opponents_values.clear();
+			
+			// Reset copyboard to the original state of the board
+			copyboard = board.copy();
+			
+		}
+		
+		// Find the index of the maximum value in the minimum_values 
+		// vector, which minimizes our loss. 
+		
+		int max_index = 0;
+		for (int i = 0; i < minimum_values.size(); i++)
+		{
+			if(minimum_values[max_index] < minimum_values[i])
+			{
+				max_index = i;
+			}
+		}
+		
+		// Make the move that minimizes our losses on the real board
+		board.doMove(&legal_moves[max_index], my_side);
+		return new Move(legal_moves[max_index]);
+	}
+	
+	else 
+	{
+		return nullptr;
+	}
+	
 	
 }

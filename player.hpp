@@ -14,7 +14,7 @@ public:
     ~Player();
 
     Move *doMove(Move *opponentsMove, int msLeft);
-    int evaluate(Move *move);
+    int evaluate(Move *move, Board board);
     bool adjacent_to_corner(Move *move);
 
     // Flag to tell if the player is running within the test_minimax context
