@@ -51,6 +51,11 @@ bool Player::adjacent_to_corner(Move *move)
 	return tl or bl or tr or br;
 }
 
+bool Player::corner(Move *move)
+{
+	return (move->getX() == 0 and move->getY() == 0) or (move->getX() == 7 and move->getY() == 0) or (move->getX() == 0 and move->getY() == 7) or (move->getX() == 7 and move->getY() == 7);
+}
+
 /*
  * Takes in a legal move, and returns a integer value representing the "goodness" of the move. 
  * This is calculated by subracting the number of pieces of your color and subtracting the number of 
@@ -68,7 +73,7 @@ int Player::evaluate(Move *move, Board board)
 	int their_points = copy->count(side_other);
 
 	// If the move is one of the four corner pieces, add three to my score.
-	if ((move->getX() == 0 and move->getY() == 0) or (move->getX() == 7 and move->getY() == 0) or (move->getX() == 0 and move->getY() == 7) or (move->getX() == 7 and move->getY() == 7))
+	if(this->corner(move))
 	{
 		my_points += 3;
 	}
@@ -85,6 +90,30 @@ int Player::evaluate(Move *move, Board board)
 }
 
 /*
+ * Go through all the moves in the board and calculate our own "count" value 
+ * given a vector of the legal moves.
+ */
+int Player::better_evaluate(vector<Move> legal_moves)
+{
+	int my_points = board.count(my_side);
+	int their_points = board.count(side_other);
+	for (int i = 0; i < legal_moves.size(); ++i)
+	{
+		if(this->corner(new Move(legal_moves[i])))
+		{
+			my_points += 3;
+		}
+
+	
+		if(this->adjacent_to_corner(new Move(legal_moves[i])))
+		{
+			my_points -= 3;
+		}
+	}
+	return my_points - their_points;
+}
+
+/*
  * Takes in a side, board object, and depth to search to
  * and returns the maximum value of the board (not optimizing for corners and edges).
  * Also sets best_move to the highest value move.
@@ -97,13 +126,6 @@ int Player::minimax(Side side, Board board, int depth)
 	}
 	else 
 		other = BLACK;
-
-	if (depth == 0) // base case
-	{
-		int my_points = board.count(side);
-		int their_points = board.count(other);
-		return my_points - their_points;
-	}
 
 	vector<Move> legal_moves;
 	Move temp = Move(0, 0);
@@ -121,13 +143,22 @@ int Player::minimax(Side side, Board board, int depth)
 		}
 	}
 
+	if (depth == 0) // base case
+	{
+		return better_evaluate(legal_moves);
+		//int my_points = board.count(side);
+		//int their_points = board.count(other);
+		//return my_points - their_points;
+	}
+
 	if (!board.hasMoves(side)) // There are no moves to be made
 	{
 		if (!board.hasMoves(other)) // opponent also has no moves.. game over
 		{
-			int my_points = board.count(side);
-			int their_points = board.count(other);
-			return my_points - their_points;  // do we ever need to do anything with this value?
+			return better_evaluate(legal_moves);
+			//int my_points = board.count(side);
+			//int their_points = board.count(other);
+			//return my_points - their_points;  // do we ever need to do anything with this value?
 		}
 		// means we have to pass this turn
 		return -minimax(other, board, depth - 1);

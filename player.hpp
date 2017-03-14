@@ -15,8 +15,10 @@ public:
 
     Move *doMove(Move *opponentsMove, int msLeft);
     int evaluate(Move *move, Board board);
+    int better_evaluate(vector<Move>  legal_moves);
     int minimax(Side side, Board board, int depth);
     bool adjacent_to_corner(Move *move);
+    bool corner(Move *move2);
     Board board;
 
     // Flag to tell if the player is running within the test_minimax context
